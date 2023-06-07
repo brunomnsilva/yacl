@@ -26,6 +26,8 @@ be taken with specific methods, namely:
 
 ## Documentation
 
+:construction: :warning: I have yet to publish the package at *Maven Central*. Please wait a few days.
+
 ### Installation
 
 Binaries and dependency information for Maven, Gradle and others can be found at [http://search.maven.org](https://central.sonatype.com/search?q=g%3Acom.brunomnsilva++a%3Ayacl&smo=true).
