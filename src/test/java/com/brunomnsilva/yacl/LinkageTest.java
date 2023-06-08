@@ -13,6 +13,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class LinkageTest {
     /*
         The linkage results are compared against the scipy library results.
+
+        https://jupyter.org/try-jupyter/
+
         We can use the following jupiter notebook to get the results:
 
         """
@@ -35,7 +38,7 @@ class LinkageTest {
         )
         df = pd.DataFrame(data=data, index=rows, columns=columns)
 
-        Z = linkage(df, 'single') # single, complete, average, weighted, ward...
+        Z = linkage(df, 'single') # single, complete, average, weighted, ward
         Z
 
      */
