@@ -33,7 +33,7 @@ public class DendogramVisualization<T extends Clusterable<T>> extends JPanel {
     public static Color COLOR_BACKGROUND = Color.WHITE;
     public static Color COLOR_FOREGROUND = Color.BLACK;
 
-    private static final int MARGIN_LEFT = 50;
+    private static final int MARGIN_LEFT = 60;
     private static final int MARGIN_TOP = 20;
     private static final int MARGIN_RIGHT = 0;
     private static int MARGIN_BOTTOM = 20; // may be dynamically changed due to cluster labeling
@@ -74,23 +74,22 @@ public class DendogramVisualization<T extends Clusterable<T>> extends JPanel {
 
         // Increase margin, since we'll not be displaying cluster ids
         if(labelType == LabelType.LABEL) {
-            MARGIN_BOTTOM = estimateMarginBottomForLabels(this.leafList);
+            MARGIN_BOTTOM = largestLeafLabelScreenLength(this.leafList) + 10; // plus some margin
         }
     }
 
-    private int estimateMarginBottomForLabels(List<Dendogram.DendogramNode<T>> leafList) {
+    private int largestLeafLabelScreenLength(List<Dendogram.DendogramNode<T>> leafList) {
+        FontMetrics fontMetrics = getFontMetrics(FONT_TEXT_SMALL);
+
         int maxLen = 0;
         for (Dendogram.DendogramNode<T> leaf : leafList) {
-            int len = leaf.getClusterable().clusterableLabel().length();
+            int len = fontMetrics.stringWidth( leaf.getClusterable().clusterableLabel() );
             if(len > maxLen) {
                 maxLen = len;
             }
         }
 
-        FontMetrics fontMetrics = getFontMetrics(FONT_TEXT_SMALL);
-        int charWidth = fontMetrics.stringWidth("_");
-
-        return Math.min(maxLen * charWidth, MAX_MARGIN_BOTTOM);
+        return Math.min(maxLen, MAX_MARGIN_BOTTOM);
     }
 
     @Override
@@ -107,6 +106,8 @@ public class DendogramVisualization<T extends Clusterable<T>> extends JPanel {
         g2.setColor(COLOR_FOREGROUND);
         g2.setFont(FONT_TEXT_SMALL);
 
+        // TODO: I'm still not happy with this, since with non monospace fonts
+        // it cannot be effectively calculated.
         FontMetrics fontMetrics = g2.getFontMetrics();
         int charWidth = fontMetrics.stringWidth("_");
         int labelMaxLength = (int)(MARGIN_BOTTOM/(float)charWidth);
@@ -195,7 +196,7 @@ public class DendogramVisualization<T extends Clusterable<T>> extends JPanel {
     }
 
     private void drawAxis(Graphics2D g2, double maxClusterLevel) {
-        g2.setFont(FONT_TEXT_SMALL);
+        g2.setFont(FONT_TEXT_REGULAR);
         g2.setColor(COLOR_FOREGROUND);
         g2.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
