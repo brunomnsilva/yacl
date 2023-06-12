@@ -8,6 +8,8 @@ import java.util.List;
  * Represents a cluster of objects.
  *
  * @param <T> the type of objects contained in the cluster, must implement the {@link Clusterable} interface
+ *
+ * @author brunomnsilva
  */
 public class Cluster<T extends Clusterable<T>> implements Iterable<T> {
 

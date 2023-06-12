@@ -2,10 +2,7 @@ package com.brunomnsilva.yacl.partitioning;
 
 import com.brunomnsilva.yacl.core.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * An implementation of the K-Means++ clustering algorithm:
@@ -26,7 +23,9 @@ public class KMeansPlusPlusClustering<T extends Clusterable<T>> {
 
     private final Distance distanceMetric;
 
-    private final List<CentroidCluster> centroidClusters;
+    private final List<CentroidCluster<T>> centroidClusters;
+
+    private final Map<CentroidCluster<T>, Boolean> centroidConvergence;
 
     /**
      * Constructs a KMeansPlusPlusClustering instance with default Euclidean distance.
@@ -74,6 +73,7 @@ public class KMeansPlusPlusClustering<T extends Clusterable<T>> {
         this.maxIterations = maxIterations;
         this.distanceMetric = distanceMetric;
         this.centroidClusters = new ArrayList<>();
+        this.centroidConvergence = new HashMap<>();
     }
 
 
@@ -84,63 +84,55 @@ public class KMeansPlusPlusClustering<T extends Clusterable<T>> {
      * @param items The list of items to be clustered.
      * @return A list of Cluster objects containing the resulting clusters.
      */
-    public List<Cluster<T>> cluster(List<T> items) {
+    public List<CentroidCluster<T>> cluster(List<T> items) {
         // Select initial centroids
-        List<double[]> centroids = selectInitialCentroids(items, numberClusters);
-
-        // Create initial centroid clusters
-        for(int i=0; i < centroids.size(); ++i) {
-            CentroidCluster centroidCluster = new CentroidCluster(i, centroids.get(i));
-            centroidClusters.add(centroidCluster);
-        }
+        selectInitialCentroids(items, numberClusters);
 
         // Perform initial assignment of items
-        assignItemsToClusters(items, centroidClusters);
+        assignItemsToClusters(items);
 
         int it = 0;
         boolean converged = false;
         while(!converged && it < maxIterations) {
-            updateCentroids(centroidClusters);
+            updateCentroids();
 
-            assignItemsToClusters(items, centroidClusters);
+            assignItemsToClusters(items);
 
-            converged = checkConvergence(centroidClusters);
+            converged = checkConvergence();
 
             it++;
         }
 
-        // Flat clustering result and return the obtained clusters
-        List<Cluster<T>> clusters = new ArrayList<>();
-        for (CentroidCluster cc : centroidClusters) {
-            clusters.add( cc.getCluster() );
-        }
-
-        return clusters;
+        return centroidClusters;
     }
 
-    private void assignItemsToClusters(List<T> items, List<CentroidCluster> centroidClusters) {
+    private void assignItemsToClusters(List<T> items) {
         // Clear current member items
-        for (CentroidCluster cc : centroidClusters) {
-            cc.getCluster().getMembers().clear();
+        for (CentroidCluster<T> cc : centroidClusters) {
+            cc.getMembers().clear();
         }
 
         // Assign items to clusters
         for (T item : items) {
             double[] point = item.clusterablePoint();
             int nearestCentroidIndex = findNearestCentroid(point, centroidClusters);
-            centroidClusters.get(nearestCentroidIndex).getCluster().addMember(item);
+            centroidClusters.get(nearestCentroidIndex).addMember(item);
         }
     }
 
-    private void updateCentroids(List<CentroidCluster> centroidClusters) {
+    private void updateCentroids() {
         // Compute new centroids from members
-        for (CentroidCluster cc : centroidClusters) {
-            double[] mean = calculateMean(cc.getCluster().getMembers());
-            cc.updateCentroid(mean);
+        for (CentroidCluster<T> cc : centroidClusters) {
+            double[] newCentroid = calculateMean(cc.getMembers());
+            // Track convergence
+            double[] previousCentroid = cc.getCentroid();
+            centroidConvergence.put(cc, Arrays.equals(previousCentroid, newCentroid));
+
+            cc.updateCentroid(newCentroid);
         }
     }
 
-    private int findNearestCentroid(double[] point, List<CentroidCluster> centroidClusters) {
+    private int findNearestCentroid(double[] point, List<CentroidCluster<T>> centroidClusters) {
         double minDistance = Double.MAX_VALUE;
         int nearestCentroidIndex = 0;
 
@@ -175,7 +167,7 @@ public class KMeansPlusPlusClustering<T extends Clusterable<T>> {
         return mean;
     }
 
-    private List<double[]> selectInitialCentroids(List<T> items, int numberCentroids) {
+    private void selectInitialCentroids(List<T> items, int numberCentroids) {
         int numPoints = items.size();
 
         // Step 1: Randomly select the first centroid
@@ -220,43 +212,20 @@ public class KMeansPlusPlusClustering<T extends Clusterable<T>> {
             }
         }
 
-        return centroids;
+        // Create initial centroid clusters
+        for(int i=0; i < centroids.size(); ++i) {
+            CentroidCluster<T> centroidCluster = new CentroidCluster<>(i, centroids.get(i));
+            centroidClusters.add(centroidCluster);
+            centroidConvergence.put(centroidCluster, false);
+        }
     }
 
-    private boolean checkConvergence(List<CentroidCluster> centroidClusters) {
-        for (CentroidCluster cc : centroidClusters) {
-            if(!cc.hasConverged())
+    private boolean checkConvergence() {
+        for (CentroidCluster<T> cc : centroidClusters) {
+            if(!centroidConvergence.get(cc))
                 return false;
         }
         return true;
     }
 
-    private class CentroidCluster {
-        private double[] centroid;
-        private final Cluster<T> cluster;
-        private boolean centroidConvergedBetweenUpdates;
-
-        public CentroidCluster(int id, double[] initialCentroid) {
-            this.cluster = new Cluster<>(id);
-            this.centroid = initialCentroid;
-            this.centroidConvergedBetweenUpdates = false;
-        }
-
-        public void updateCentroid(double[] newCentroid) {
-            centroidConvergedBetweenUpdates = Arrays.equals(centroid, newCentroid);
-            centroid = newCentroid;
-        }
-
-        public boolean hasConverged() {
-            return centroidConvergedBetweenUpdates;
-        }
-
-        public double[] getCentroid() {
-            return centroid;
-        }
-
-        public Cluster<T> getCluster() {
-            return cluster;
-        }
-    }
 }

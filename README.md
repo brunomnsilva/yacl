@@ -281,9 +281,9 @@ specify in the constructor other metric distances (existing or user-defined).
 
 ```java
 KMeansPlusPlusClustering<MyVectorN> kmeans = new KMeansPlusPlusClustering<>(3 /*, new ManhattanDistance()*/);
-List<Cluster<MyVectorN>> kclusters = kmeans.cluster(samples);
+List<CentroidCluster<MyVectorN>> kclusters = kmeans.cluster(samples);
 
-for (Cluster<MyVectorN> cluster : kclusters) {
+for (CentroidCluster<MyVectorN> cluster : kclusters) {
     System.out.println(cluster);
 }
 ```
