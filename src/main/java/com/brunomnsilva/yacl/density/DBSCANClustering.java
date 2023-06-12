@@ -53,6 +53,60 @@ public class DBSCANClustering<T extends Clusterable<T>> {
      * @return a list of clusters containing the clustered items
      */
     public List<Cluster<T>> cluster(List<T> items) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+        Args.nullNotPermitted(items, "items");
+
+        // TODO: Remove after first implementation attempt
+        if(true) throw new UnsupportedOperationException("Not implemented yet.");
+
+        // Create the distance matrix between all items
+        DistanceMatrix<T> distanceMatrix = DistanceMatrix.fromPointDistances(items, distanceMetric);
+
+        // Track the unvisited items (points)
+        List<T> unvisited = new ArrayList<>(items);
+
+        // Each iteration will produce at most a cluster
+        while(!unvisited.isEmpty()) {
+            // 1.  Select a random unvisited point
+            T currentItem = unvisited.get(randomNumber(0, unvisited.size() - 1)); // O(1)
+
+            // Check other items where dist(currentItem, otherItem) < eps
+            List<T> reachable = new ArrayList<>();
+            for(T otherItem : distanceMatrix.items()) {
+                if(currentItem == otherItem) continue;
+
+                double distance = distanceMatrix.getDistance(currentItem, otherItem);
+                if(distance <= eps) {
+                    reachable.add(otherItem);
+                }
+            }
+
+            int numNeighbors = reachable.size();
+            if(numNeighbors == 0) {
+                // Noise
+
+            } else if(numNeighbors < minPts) {
+                // Reachable, but not core point
+
+            } else {
+                // Core point
+
+            }
+
+
+            unvisited.remove(currentItem); // O(n)
+
+            // TODO: is it safe to delete the core points from the distance matrix? I believe so.
+        }
+
+        return null;
+    }
+
+    private static int randomNumber(int lower, int upper) {
+        if (lower >= upper) {
+            throw new IllegalArgumentException("Upper bound must be greater than lower bound.");
+        }
+
+        Random random = new Random();
+        return random.nextInt(upper - lower + 1) + lower;
     }
 }
