@@ -41,7 +41,8 @@ public class HierarchicalClustering<T extends Clusterable<T>> {
 
     /**
      * Performs hierarchical clustering on the provided list of items.
-     *
+     * <br/>
+     * The algorithm ensures all items belong to a cluster.
      * @param items the list of samples to cluster
      * @return the result of the hierarchical clustering
      */

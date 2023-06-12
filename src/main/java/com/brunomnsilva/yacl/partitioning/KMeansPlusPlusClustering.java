@@ -80,7 +80,8 @@ public class KMeansPlusPlusClustering<T extends Clusterable<T>> {
     /**
      * Performs the clustering algorithm on the given list of items and returns a list of clusters.
      * Each cluster contains a subset of the input items that are grouped together based on their similarity.
-     *
+     * <br/>
+     * The algorithm ensures all items belong to a cluster.
      * @param items The list of items to be clustered.
      * @return A list of Cluster objects containing the resulting clusters.
      */
