@@ -109,7 +109,7 @@ public class DendogramVisualization<T extends Clusterable<T>> extends JPanel {
         // TODO: I'm still not happy with this, since with non monospace fonts
         // it cannot be effectively calculated.
         FontMetrics fontMetrics = g2.getFontMetrics();
-        int charWidth = fontMetrics.stringWidth("_");
+        int charWidth = fontMetrics.stringWidth(",");
         int labelMaxLength = (int)(MARGIN_BOTTOM/(float)charWidth);
 
         // Cache nodes locations
