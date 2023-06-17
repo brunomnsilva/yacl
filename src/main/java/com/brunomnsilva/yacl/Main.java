@@ -1,6 +1,7 @@
 package com.brunomnsilva.yacl;
 
 import com.brunomnsilva.yacl.core.*;
+import com.brunomnsilva.yacl.density.DBSCANClustering;
 import com.brunomnsilva.yacl.hierarchical.Dendogram;
 import com.brunomnsilva.yacl.hierarchical.DendogramCut;
 import com.brunomnsilva.yacl.hierarchical.HierarchicalClustering;
@@ -16,7 +17,7 @@ import java.util.Random;
 public class Main {
     public static void main(String[] args) {
 
-        Random rnd = new Random(667);
+        Random rnd = new Random(/* 667 */);
 
         int numSamples = 50;
         List<MyVectorN> samples = new ArrayList<>();
@@ -47,12 +48,24 @@ public class Main {
 
         // K-Means++ Usage
         System.out.println("K-MEANS++");
-        KMeansPlusPlusClustering<MyVectorN> kmeans = new KMeansPlusPlusClustering<>(3 /*, new ManhattanDistance()*/);
+        KMeansPlusPlusClustering<MyVectorN> kmeans = new KMeansPlusPlusClustering<>(3
+, new ManhattanDistance()
+);
         List<CentroidCluster<MyVectorN>> kclusters = kmeans.cluster(samples);
 
         for (CentroidCluster<MyVectorN> cluster : kclusters) {
             System.out.println(cluster);
         }
+
+        // DBSCAN Usage
+        System.out.println("DBSCAN");
+        DBSCANClustering<MyVectorN> dbscan = new DBSCANClustering<>(0.3, 5);
+        List<Cluster<MyVectorN>> dbclusters = dbscan.cluster(samples);
+
+        for (Cluster<MyVectorN> cluster : dbclusters) {
+            System.out.println(cluster);
+        }
+
     }
 
     public static class MyVectorN implements Clusterable<MyVectorN> {
