@@ -12,9 +12,8 @@ Clustering methods and features:
   - Cluster extraction from dendogram cut;
 - [X] Partitioning:
   - K-Means++;
-- [ ] Density-based:
-  - DBSCAN;
-  - OPTICS;
+- [X] Density-based:
+  - DBSCAN (requires further testing);
 - [ ] ...
 
 The clustering methods can utilize any *distance metric* that implements the `Distance` interface, altough some care must
@@ -25,8 +24,6 @@ be taken with specific methods, namely:
 :bulb: If you are interested in *neural models* for clustering, check out the [Ubiquitous Neural Networks](https://github.com/brunomnsilva/UbiquitousNeuralNetworks) library.
 
 ## Documentation
-
-:construction: :warning: I have yet to publish the package at *Maven Central*. Please wait a few days.
 
 ### Installation
 

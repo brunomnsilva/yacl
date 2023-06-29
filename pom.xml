@@ -6,7 +6,7 @@
 
     <groupId>com.brunomnsilva</groupId>
     <artifactId>yacl</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
@@ -34,6 +34,12 @@
             <organizationUrl>http://www.brunomnsilva.com</organizationUrl>
         </developer>
     </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/brunomnsilva/yacl.git</connection>
+        <developerConnection>scm:git:ssh://github.com:brunomnsilva/yacl.git</developerConnection>
+        <url>http://github.com/brunomnsilva/yacl/tree/master</url>
+    </scm>
 
     <distributionManagement>
         <snapshotRepository>
